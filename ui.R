@@ -30,6 +30,10 @@ ui <- dashboardPage(
                   fileInput('liggeneli', 'Upload Ligand Genelist',accept=c('text/csv','text/comma-separated-values,text/plain','.txt')),
                   fileInput('recgeneli', 'Upload Receptor Genelist',accept=c('text/csv','text/comma-separated-values,text/plain','.txt')),
                   selectInput("org","Select the organism",c("Mouse","Human"),selected = "Mouse"),
+                  fluidRow(
+                    column(6,uiOutput('source')),
+                    column(6,uiOutput('evidence'))
+                  ),
                   uiOutput("dwldtab")
                   ),
               box(width = 12, status = "primary",solidHeader = TRUE,title = "Ligand-Receptor pairs",

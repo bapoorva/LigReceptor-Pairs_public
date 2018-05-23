@@ -18,11 +18,18 @@ library(readxl)
 library(Biobase)
 server <- function(input, output,session) {
   
-  ###################################################
-  ###################################################
-  ####### COMPARE EFFECTS AND DISPLAY RESULTS #######
-  ###################################################
-  ###################################################
+  output$source <- renderUI({
+    if(input$org=="Mouse"){rl=read.csv("data/Mm_PairsLigRec.csv")}else if(input$org=="Human"){rl=read.csv("data/Hs_PairsLigRec.csv")}
+    options=as.character(unique(rl$Pair.Source))
+    selectInput('source', 'Select source',c(options,"All"),selected="All")
+  })
+  
+  output$evidence <- renderUI({
+    if(input$org=="Mouse"){rl=read.csv("data/Mm_PairsLigRec.csv")}else if(input$org=="Human"){rl=read.csv("data/Hs_PairsLigRec.csv")}
+    options=as.character(unique(rl$Pair.Evidence))
+    selectInput('evidence', 'Select Evidence',c(options,"All"),selected="All")
+  })
+  
   firstup <- function(x) {
     substr(x, 1, 1) <- toupper(substr(x, 1, 1))
     x
@@ -32,14 +39,7 @@ server <- function(input, output,session) {
     rl=read.csv("data/lig-rec.csv")
     org=input$org
     
-    if(org=="human"){
-      rl= rl %>% dplyr::select(Pair.Name:Receptor.ApprovedSymbol)
-      rl$Pair.Name=toupper(rl$Pair.Name)
-      rl$Ligand.ApprovedSymbol=toupper(rl$Ligand.ApprovedSymbol)
-      rl$Receptor.ApprovedSymbol=toupper(rl$Receptor.ApprovedSymbol)
-    }else if(org=="mouse"){
-      rl= rl %>% dplyr::select(Mouse_LigandSym:Mouse.Pairs) %>% rename("Mouse.Pairs"="Pair.Name","Mouse_LigandSym"="Ligand.ApprovedSymbol","Mouse_RecSym"="Receptor.ApprovedSymbol")
-    }
+    if(input$org=="Mouse"){rl=read.csv("data/Mm_PairsLigRec.csv")}else if(input$org=="Human"){rl=read.csv("data/Hs_PairsLigRec.csv")}
     validate(
       need(input$liggeneli, "Please Upload Ligand genelist")
     )
@@ -58,24 +58,26 @@ server <- function(input, output,session) {
       rgenes=tolower(rgenes)
       rgenes=firstup(rgenes)
   
-      rl=rl[(rl$Receptor.ApprovedSymbol %in% rgenes) & (rl$Ligand.ApprovedSymbol %in% lgenes),]
+      rl=rl[(rl$receptor %in% rgenes) & (rl$ligand %in% lgenes),]
     # if(is.null(lgenes)==F & is.null(rgenes)==T ){
-    #   rl=rl[rl$Ligand.ApprovedSymbol %in% lgenes,]
+    #   rl=rl[rl$ligand %in% lgenes,]
     # }else if(is.null(lgenes)==T & is.null(rgenes)==F){
-    #   rl=rl[rl$Receptor.ApprovedSymbol %in% rgenes,]
+    #   rl=rl[rl$receptor %in% rgenes,]
     # }else if(is.null(lgenes)==F & is.null(rgenes)==F ){
-    #   rl=rl[(rl$Receptor.ApprovedSymbol %in% rgenes) & (rl$Ligand.ApprovedSymbol %in% lgenes),]
+    #   rl=rl[(rl$receptor %in% rgenes) & (rl$ligand %in% lgenes),]
     # }else{rl=rl}
     
     validate(
       need(nrow(rl)>=1, "No Ligand-Receptor Pairs found within the genelists uploaded")
     )
-    recid=toupper(rl$Receptor.ApprovedSymbol)
-    ligid=toupper(rl$Ligand.ApprovedSymbol)
+    recid=toupper(rl$receptor)
+    ligid=toupper(rl$ligand)
     urlr= paste("http://www.genecards.org/cgi-bin/carddisp.pl?gene=",recid,sep = "")
     urll= paste("http://www.genecards.org/cgi-bin/carddisp.pl?gene=",ligid,sep = "")
-    rl$Receptor.ApprovedSymbol=paste0("<a href='",urlr,"'target='_blank'>",rl$Receptor.ApprovedSymbol,"</a>")
-    rl$Ligand.ApprovedSymbol=paste0("<a href='",urll,"'target='_blank'>",rl$Ligand.ApprovedSymbol,"</a>")
+    rl$receptor=paste0("<a href='",urlr,"'target='_blank'>",rl$receptor,"</a>")
+    rl$ligand=paste0("<a href='",urll,"'target='_blank'>",rl$ligand,"</a>")
+    if(input$source!="All"){rl=rl[rl$Pair.Source==input$source,]}
+    if(input$evidence!="All"){rl=rl[rl$Pair.Evidence==input$evidence,]}
     return(rl)
   })
   
