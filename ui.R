@@ -26,14 +26,14 @@ ui <- dashboardPage(
     useShinyjs(),
     tabItems(
       tabItem(tabName = "dashboard",
-              box(width = 6, status = "primary",solidHeader = TRUE,title = "Ligand Selection Panel",
-                    fileInput('liggeneli', 'Upload Receptor Genelist',accept=c('text/csv','text/comma-separated-values,text/plain','.txt'))
-                  ),
-              box(width = 6, status = "primary",solidHeader = TRUE,title = "Receptor Selection Panel",
-                    fileInput('recgeneli', 'Upload Receptor Genelist',accept=c('text/csv','text/comma-separated-values,text/plain','.txt'))
+              box(width = 12, status = "primary",solidHeader = TRUE,title = "Ligand Selection Panel",
+                  fileInput('liggeneli', 'Upload Ligand Genelist',accept=c('text/csv','text/comma-separated-values,text/plain','.txt')),
+                  fileInput('recgeneli', 'Upload Receptor Genelist',accept=c('text/csv','text/comma-separated-values,text/plain','.txt')),
+                  selectInput("org","Select the organism",c("Mouse","Human"),selected = "Mouse"),
+                  uiOutput("dwldtab")
                   ),
               box(width = 12, status = "primary",solidHeader = TRUE,title = "Ligand-Receptor pairs",
-                  DT::dataTableOutput('ligrecpairs'),uiOutput("dwldtab"))
+                  DT::dataTableOutput('ligrecpairs'))
       )#end of tabitem
     )#end of tabitems
   )#end of dashboardbosy
