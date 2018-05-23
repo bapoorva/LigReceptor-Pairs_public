@@ -66,7 +66,14 @@ server <- function(input, output,session) {
     # }else if(is.null(lgenes)==F & is.null(rgenes)==F ){
     #   rl=rl[(rl$receptor %in% rgenes) & (rl$ligand %in% lgenes),]
     # }else{rl=rl}
+      if(input$source!="All"){rl=rl[rl$Pair.Source==input$source,]}
+      if(input$evidence!="All"){rl=rl[rl$Pair.Evidence==input$evidence,]}
     
+    return(rl)
+  })
+  
+  table = reactive({
+    rl=ligrecpairs()
     validate(
       need(nrow(rl)>=1, "No Ligand-Receptor Pairs found within the genelists uploaded")
     )
@@ -76,12 +83,10 @@ server <- function(input, output,session) {
     urll= paste("http://www.genecards.org/cgi-bin/carddisp.pl?gene=",ligid,sep = "")
     rl$receptor=paste0("<a href='",urlr,"'target='_blank'>",rl$receptor,"</a>")
     rl$ligand=paste0("<a href='",urll,"'target='_blank'>",rl$ligand,"</a>")
-    if(input$source!="All"){rl=rl[rl$Pair.Source==input$source,]}
-    if(input$evidence!="All"){rl=rl[rl$Pair.Evidence==input$evidence,]}
+    # if(input$source!="All"){rl=rl[rl$Pair.Source==input$source,]}
+    # if(input$evidence!="All"){rl=rl[rl$Pair.Evidence==input$evidence,]}
     return(rl)
   })
-  
-  
   
   #print data TABLE
   output$ligrecpairs = DT::renderDataTable({
@@ -96,7 +101,7 @@ server <- function(input, output,session) {
     input$liggeneli
     input$recgeneli
     withProgress(session = session, message = 'Generating...',detail = 'Please Wait...',{
-      DT::datatable(ligrecpairs(),
+      DT::datatable(table(),
                     extensions = c('Buttons','Scroller'),
                     options = list(dom = 'Bfrtip',
                                    searchHighlight = TRUE,
@@ -113,7 +118,7 @@ server <- function(input, output,session) {
   }) 
   
   output$dwldtable <- downloadHandler(
-    filename = function() { paste(input$ligprj,"_",input$ligtype,"_",input$recprj,"_",input$rectype,'.csv', sep='') },
+    filename = function() { "ligand_receptor_pairs.csv" },
     content = function(file) {
       write.csv(ligrecpairs(), file,row.names=FALSE)
     })
