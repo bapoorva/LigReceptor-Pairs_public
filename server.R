@@ -66,8 +66,8 @@ server <- function(input, output,session) {
     # }else if(is.null(lgenes)==F & is.null(rgenes)==F ){
     #   rl=rl[(rl$receptor %in% rgenes) & (rl$ligand %in% lgenes),]
     # }else{rl=rl}
-      if(input$checksource==T){rl=rl[rl$Pair.Source==input$source,]}
-      if(input$checkevi==T){rl=rl[rl$Pair.Evidence==input$evidence,]}
+      if(input$checksource==T){rl=rl[rl$Pair.Source %in% input$source,]}
+      if(input$checkevi==T){rl=rl[rl$Pair.Evidence %in% input$evidence,]}
     
     return(rl)
   })
