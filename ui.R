@@ -31,8 +31,16 @@ ui <- dashboardPage(
                   fileInput('recgeneli', 'Upload Receptor Genelist',accept=c('text/csv','text/comma-separated-values,text/plain','.txt')),
                   selectInput("org","Select the organism",c("Mouse","Human"),selected = "Mouse"),
                   fluidRow(
-                    column(6,uiOutput('source')),
-                    column(6,uiOutput('evidence'))
+                    column(6,checkboxInput("checksource", label = "Check to select by source", value = FALSE)),
+                    column(6,checkboxInput("checkevi", label = "Check to select by evidence", value = FALSE)),
+                    conditionalPanel(
+                      condition = "input.checksource ==true",
+                      column(6,uiOutput('source'))
+                    ),
+                    conditionalPanel(
+                      condition = "input.checkevi ==true",
+                      column(6,uiOutput('evidence'))
+                    )
                   ),
                   uiOutput("dwldtab")
                   ),

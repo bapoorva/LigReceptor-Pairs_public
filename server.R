@@ -21,13 +21,13 @@ server <- function(input, output,session) {
   output$source <- renderUI({
     if(input$org=="Mouse"){rl=read.csv("data/Mm_PairsLigRec.csv")}else if(input$org=="Human"){rl=read.csv("data/Hs_PairsLigRec.csv")}
     options=as.character(unique(rl$Pair.Source))
-    selectInput('source', 'Select source',c(options,"All"),selected="All")
+    checkboxGroupInput('source', label='Select source(s)',choices=options,selected=options[1])
   })
   
   output$evidence <- renderUI({
     if(input$org=="Mouse"){rl=read.csv("data/Mm_PairsLigRec.csv")}else if(input$org=="Human"){rl=read.csv("data/Hs_PairsLigRec.csv")}
     options=as.character(unique(rl$Pair.Evidence))
-    selectInput('evidence', 'Select Evidence',c(options,"All"),selected="All")
+    checkboxGroupInput('evidence',label='Select Evidence(s)',choices=options,selected=options[1])
   })
   
   firstup <- function(x) {
@@ -66,8 +66,8 @@ server <- function(input, output,session) {
     # }else if(is.null(lgenes)==F & is.null(rgenes)==F ){
     #   rl=rl[(rl$receptor %in% rgenes) & (rl$ligand %in% lgenes),]
     # }else{rl=rl}
-      if(input$source!="All"){rl=rl[rl$Pair.Source==input$source,]}
-      if(input$evidence!="All"){rl=rl[rl$Pair.Evidence==input$evidence,]}
+      if(input$checksource==T){rl=rl[rl$Pair.Source==input$source,]}
+      if(input$checkevi==T){rl=rl[rl$Pair.Evidence==input$evidence,]}
     
     return(rl)
   })
